@@ -6,6 +6,8 @@ import 'package:aves/app_mode.dart';
 import 'package:aves/l10n/l10n.dart';
 import 'package:aves/model/apps.dart';
 import 'package:aves/model/device.dart';
+import 'package:aves/model/entry/entry.dart';
+import 'package:aves/model/entry/extensions/catalog.dart';
 import 'package:aves/model/filters/recent.dart';
 import 'package:aves/model/settings/defaults.dart';
 import 'package:aves/model/settings/enums/accessibility_animations.dart';
@@ -16,6 +18,7 @@ import 'package:aves/model/settings/settings.dart';
 import 'package:aves/model/source/collection_lens.dart';
 import 'package:aves/model/source/collection_source.dart';
 import 'package:aves/model/source/media_store_source.dart';
+import 'package:aves/ref/mime_types.dart';
 import 'package:aves/services/accessibility_service.dart';
 import 'package:aves/services/common/services.dart';
 import 'package:aves/theme/colors.dart';
@@ -23,6 +26,7 @@ import 'package:aves/theme/durations.dart';
 import 'package:aves/theme/icons.dart';
 import 'package:aves/theme/styles.dart';
 import 'package:aves/theme/themes.dart';
+import 'package:aves/utils/android_file_utils.dart';
 import 'package:aves/utils/debouncer.dart';
 import 'package:aves/widgets/collection/collection_grid.dart';
 import 'package:aves/widgets/collection/collection_page.dart';
@@ -30,17 +34,20 @@ import 'package:aves/widgets/common/basic/scaffold.dart';
 import 'package:aves/widgets/common/behaviour/route_tracker.dart';
 import 'package:aves/widgets/common/behaviour/routes.dart';
 import 'package:aves/widgets/common/extensions/build_context.dart';
+import 'package:aves/widgets/common/identity/buttons/outlined_button.dart';
 import 'package:aves/widgets/common/providers/durations_provider.dart';
 import 'package:aves/widgets/common/providers/highlight_info_provider.dart';
 import 'package:aves/widgets/common/providers/media_query_data_provider.dart';
 import 'package:aves/widgets/home_page.dart';
 import 'package:aves/widgets/navigation/tv_page_transitions.dart';
 import 'package:aves/widgets/navigation/tv_rail.dart';
+import 'package:aves/widgets/viewer/entry_viewer_page.dart';
 import 'package:aves/widgets/welcome_page.dart';
 import 'package:aves_model/aves_model.dart';
 import 'package:aves_utils/aves_utils.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:equatable/equatable.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -415,7 +422,7 @@ class _AvesAppState extends State<AvesApp> with WidgetsBindingObserver {
     }
   }
 
-  Widget _getFirstPage({Map? intentData}) => settings.hasAcceptedTerms ? HomePage(intentData: intentData) : const WelcomePage();
+  Widget _getFirstPage({Map? intentData}) => VideoPickPage();
 
   Size? _getScreenSize(BuildContext context) {
     final view = View.of(context);
@@ -650,3 +657,57 @@ class AvesScrollBehavior extends MaterialScrollBehavior {
 }
 
 typedef TvMediaQueryModifier = MediaQueryData Function(MediaQueryData);
+
+class VideoPickPage extends StatelessWidget {
+  const VideoPickPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AvesOutlinedButton(
+              label: 'pick video (SAF URI)',
+              onPressed: () async {
+                final uri = await storageService.selectFile(MimeTypes.anyVideo);
+                await _play(context, uri);
+              },
+            ),
+            AvesOutlinedButton(
+              label: 'pick video (cache copy)',
+              onPressed: () async {
+                final result = await FilePicker.platform.pickFiles(type: FileType.video);
+                if (result?.files.isNotEmpty ?? false) {
+                  final path = result!.files.first.path;
+                  if (path != null) {
+                    final uri = 'file://${Uri.encodeFull(path)}';
+                    await _play(context, uri);
+                  }
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _play(BuildContext context, String? uri) async {
+    if (uri != null) {
+      final entry = await mediaFetchService.getEntry(uri, null);
+      if (entry != null) {
+        await metadataDb.init();
+        await androidFileUtils.init();
+        await entry.catalog(background: false, force: false, persist: false);
+        unawaited(Navigator.maybeOf(context)?.push(
+          MaterialPageRoute(
+            settings: const RouteSettings(name: EntryViewerPage.routeName),
+            builder: (context) => EntryViewerPage(initialEntry: entry),
+          ),
+        ));
+      }
+    }
+  }
+}

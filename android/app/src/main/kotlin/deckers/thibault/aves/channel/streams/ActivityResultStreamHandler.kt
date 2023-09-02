@@ -47,6 +47,7 @@ class ActivityResultStreamHandler(private val activity: Activity, arguments: Any
             "requestMediaFileAccess" -> ioScope.launch { requestMediaFileAccess() }
             "createFile" -> ioScope.launch { createFile() }
             "openFile" -> ioScope.launch { openFile() }
+            "selectFile" -> ioScope.launch { selectFile() }
             "pickCollectionFilters" -> pickCollectionFilters()
             else -> endOfStream()
         }
@@ -170,6 +171,24 @@ class ActivityResultStreamHandler(private val activity: Activity, arguments: Any
 
         fun onDenied() {
             success(ByteArray(0))
+            endOfStream()
+        }
+
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            setTypeAndNormalize(mimeType ?: MimeTypes.ANY)
+        }
+        safeStartActivityForResult(intent, MainActivity.OPEN_FILE_REQUEST, ::onGranted, ::onDenied)
+    }
+
+    private suspend fun selectFile() {
+        val mimeType = args["mimeType"] as String? // optional
+
+        fun onGranted(uri: Uri) {
+            success(uri.toString())
+        }
+
+        fun onDenied() {
             endOfStream()
         }
 

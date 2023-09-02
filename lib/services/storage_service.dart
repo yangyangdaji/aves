@@ -41,6 +41,8 @@ abstract class StorageService {
   Future<bool?> createFile(String name, String mimeType, Uint8List bytes);
 
   Future<Uint8List> openFile([String? mimeType]);
+
+  Future<String?> selectFile([String? mimeType]);
 }
 
 class PlatformStorageService implements StorageService {
@@ -289,5 +291,28 @@ class PlatformStorageService implements StorageService {
       await reportService.recordError(e, stack);
     }
     return Uint8List(0);
+  }
+
+  @override
+  Future<String?> selectFile([String? mimeType]) async {
+    try {
+      final completer = Completer<String?>();
+      _stream.receiveBroadcastStream(<String, dynamic>{
+        'op': 'selectFile',
+        'mimeType': mimeType,
+      }).listen(
+            (data) => completer.complete(data as String?),
+        onError: completer.completeError,
+        onDone: () {
+          if (!completer.isCompleted) completer.complete(null);
+        },
+        cancelOnError: true,
+      );
+      // `await` here, so that `completeError` will be caught below
+      return await completer.future;
+    } on PlatformException catch (e, stack) {
+      await reportService.recordError(e, stack);
+    }
+    return null;
   }
 }

@@ -70,6 +70,7 @@ dependencies:
     git:
       url: https://github.com/deckerst/expansion_tile_card.git
   flex_color_picker:
+  file_picker:
   floating:
   fluster:
   flutter_displaymode:
