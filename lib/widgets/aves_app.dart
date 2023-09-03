@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:aves/app_flavor.dart';
@@ -6,7 +8,6 @@ import 'package:aves/app_mode.dart';
 import 'package:aves/l10n/l10n.dart';
 import 'package:aves/model/apps.dart';
 import 'package:aves/model/device.dart';
-import 'package:aves/model/entry/entry.dart';
 import 'package:aves/model/entry/extensions/catalog.dart';
 import 'package:aves/model/filters/recent.dart';
 import 'package:aves/model/settings/defaults.dart';
@@ -42,16 +43,15 @@ import 'package:aves/widgets/home_page.dart';
 import 'package:aves/widgets/navigation/tv_page_transitions.dart';
 import 'package:aves/widgets/navigation/tv_rail.dart';
 import 'package:aves/widgets/viewer/entry_viewer_page.dart';
-import 'package:aves/widgets/welcome_page.dart';
 import 'package:aves_model/aves_model.dart';
 import 'package:aves_utils/aves_utils.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:equatable/equatable.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localization_nn/flutter_localization_nn.dart';
+import 'package:intl/intl.dart';
 import 'package:material_color_utilities/material_color_utilities.dart';
 import 'package:overlay_support/overlay_support.dart';
 import 'package:provider/provider.dart';
@@ -676,18 +676,30 @@ class VideoPickPage extends StatelessWidget {
               },
             ),
             AvesOutlinedButton(
-              label: 'pick video (cache copy)',
+              label: 'save logs',
               onPressed: () async {
-                final result = await FilePicker.platform.pickFiles(type: FileType.video);
-                if (result?.files.isNotEmpty ?? false) {
-                  final path = result!.files.first.path;
-                  if (path != null) {
-                    final uri = 'file://${Uri.encodeFull(path)}';
-                    await _play(context, uri);
-                  }
-                }
+                final result = await Process.run('logcat', ['-d']);
+                final logs = result.stdout;
+                await storageService.createFile(
+                  'aves-issue722-logs-${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.txt',
+                  MimeTypes.plainText,
+                  Uint8List.fromList(utf8.encode(logs)),
+                );
               },
             ),
+            // AvesOutlinedButton(
+            //   label: 'pick video (cache copy)',
+            //   onPressed: () async {
+            //     final result = await FilePicker.platform.pickFiles(type: FileType.video);
+            //     if (result?.files.isNotEmpty ?? false) {
+            //       final path = result!.files.first.path;
+            //       if (path != null) {
+            //         final uri = 'file://${Uri.encodeFull(path)}';
+            //         await _play(context, uri);
+            //       }
+            //     }
+            //   },
+            // ),
           ],
         ),
       ),

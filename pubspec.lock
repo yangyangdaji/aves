@@ -9,14 +9,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "61.0.0"
-  _flutterfire_internals:
-    dependency: transitive
-    description:
-      name: _flutterfire_internals
-      sha256: "1a5e13736d59235ce0139621b4bbe29bc89839e202409081bc667eb3cd20674c"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.3.5"
   analyzer:
     dependency: transitive
     description:
@@ -80,7 +72,7 @@ packages:
   aves_report_platform:
     dependency: "direct main"
     description:
-      path: "plugins/aves_report_crashlytics"
+      path: "plugins/aves_report_console"
       relative: true
     source: path
     version: "0.0.1"
@@ -101,7 +93,7 @@ packages:
   aves_services_platform:
     dependency: "direct main"
     description:
-      path: "plugins/aves_services_google"
+      path: "plugins/aves_services_none"
       relative: true
     source: path
     version: "0.0.1"
@@ -254,14 +246,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.3"
-  csslib:
-    dependency: transitive
-    description:
-      name: csslib
-      sha256: "706b5707578e0c1b4b7550f64078f0a0f19dec3f50a178ffae7006b0a9ca58fb"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.0"
   custom_rounded_rectangle_border:
     dependency: transitive
     description:
@@ -384,46 +368,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "5.5.0"
-  firebase_core:
-    dependency: transitive
-    description:
-      name: firebase_core
-      sha256: c78132175edda4bc532a71e01a32964e4b4fcf53de7853a422d96dac3725f389
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.15.1"
-  firebase_core_platform_interface:
-    dependency: transitive
-    description:
-      name: firebase_core_platform_interface
-      sha256: b63e3be6c96ef5c33bdec1aab23c91eb00696f6452f0519401d640938c94cba2
-      url: "https://pub.dev"
-    source: hosted
-    version: "4.8.0"
-  firebase_core_web:
-    dependency: transitive
-    description:
-      name: firebase_core_web
-      sha256: "4cf4d2161530332ddc3c562f19823fb897ff37a9a774090d28df99f47370e973"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.7.0"
-  firebase_crashlytics:
-    dependency: transitive
-    description:
-      name: firebase_crashlytics
-      sha256: fd9e1a1cb7cce3f9dd2358d8363d235f25f056981e23a333db1e57eca693913f
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.3.5"
-  firebase_crashlytics_platform_interface:
-    dependency: transitive
-    description:
-      name: firebase_crashlytics_platform_interface
-      sha256: "0d19ef23cf7a917a357d2eb1807338ec536ec3232e729ebd769f5bb2aba9e085"
-      url: "https://pub.dev"
-    source: hosted
-    version: "3.6.5"
   flex_color_picker:
     dependency: "direct main"
     description:
@@ -583,78 +527,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.2"
-  google_api_availability:
-    dependency: transitive
-    description:
-      name: google_api_availability
-      sha256: "3e9548cfd991d983d11425a2436d5bd957d048c279cc9e145ffe3f36fd847385"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.0.0"
-  google_api_availability_android:
-    dependency: transitive
-    description:
-      name: google_api_availability_android
-      sha256: d95429ae78083585c312de2c6578085e7d53d100a94656d691bce0bb0ce435be
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.1"
-  google_api_availability_platform_interface:
-    dependency: transitive
-    description:
-      name: google_api_availability_platform_interface
-      sha256: "65b7da62fe5b582bb3d508628ad827d36d890710ea274766a992a56fa5420da6"
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.0.1"
-  google_maps:
-    dependency: transitive
-    description:
-      name: google_maps
-      sha256: "555d5d736339b0478e821167ac521c810d7b51c3b2734e6802a9f046b64ea37a"
-      url: "https://pub.dev"
-    source: hosted
-    version: "6.3.0"
-  google_maps_flutter:
-    dependency: transitive
-    description:
-      name: google_maps_flutter
-      sha256: "71b26389e86b17e2e8a8403318c92f316655f089580236892969c230013c6e38"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.4.1"
-  google_maps_flutter_android:
-    dependency: transitive
-    description:
-      name: google_maps_flutter_android
-      sha256: e6cb018169e49332f88d23b1d2119b09e8ab4e7d3a1b889a1b7b3fd113e034ba
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.5.1"
-  google_maps_flutter_ios:
-    dependency: transitive
-    description:
-      name: google_maps_flutter_ios
-      sha256: "2a595c9789070786c654e9772ec0d1bb759ae37d2dd776291af5398531274e06"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.3.1"
-  google_maps_flutter_platform_interface:
-    dependency: transitive
-    description:
-      name: google_maps_flutter_platform_interface
-      sha256: a3e9e6896501e566d902c6c69f010834d410ef4b7b5c18b90c77e871c86b7907
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.4.1"
-  google_maps_flutter_web:
-    dependency: transitive
-    description:
-      name: google_maps_flutter_web
-      sha256: f893d1542c6562bc8299ef768fbbe92ade83c220ab3209b9477ec9f81ad585e4
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.5.4+2"
   highlight:
     dependency: transitive
     description:
@@ -663,14 +535,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.0"
-  html:
-    dependency: transitive
-    description:
-      name: html
-      sha256: "3a7812d5bcd2894edf53dfaf8cd640876cf6cef50a8f238745c8b8120ea74d3a"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.15.4"
   http:
     dependency: transitive
     description:
@@ -727,14 +591,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.6.7"
-  js_wrapping:
-    dependency: transitive
-    description:
-      name: js_wrapping
-      sha256: e385980f7c76a8c1c9a560dfb623b890975841542471eade630b2871d243851c
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.7.4"
   latlong2:
     dependency: "direct main"
     description:
@@ -1193,14 +1049,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.0.2"
-  sanitize_html:
-    dependency: transitive
-    description:
-      name: sanitize_html
-      sha256: "0a445f19bbaa196f5a4f93461aa066b94e6e025622eb1e9bc77872a5e25233a5"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.0"
   screen_brightness:
     dependency: "direct main"
     description:
@@ -1406,14 +1254,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
-  stream_transform:
-    dependency: transitive
-    description:
-      name: stream_transform
-      sha256: "14a00e794c7c11aa145a170587321aedce29769c08d7f58b1d141da75e3b1c6f"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.1.0"
   streams_channel:
     dependency: "direct main"
     description:
