@@ -6,7 +6,9 @@ import android.net.Uri
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.provider.MediaStore
 import android.util.Log
+import androidx.annotation.RequiresApi
 import deckers.thibault.aves.MainActivity
 import deckers.thibault.aves.PendingStorageAccessResultHandler
 import deckers.thibault.aves.utils.LogUtils
@@ -185,7 +187,11 @@ class ActivityResultStreamHandler(private val activity: Activity, arguments: Any
         val mimeType = args["mimeType"] as String? // optional
 
         fun onGranted(uri: Uri) {
-            success(uri.toString())
+            var mediaUri = uri
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                MediaStore.getMediaUri(activity, uri)?.let { mediaUri = it }
+            }
+            success(mediaUri.toString())
         }
 
         fun onDenied() {

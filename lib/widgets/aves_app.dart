@@ -6,6 +6,7 @@ import 'dart:math';
 import 'package:aves/app_flavor.dart';
 import 'package:aves/app_mode.dart';
 import 'package:aves/l10n/l10n.dart';
+import 'package:aves/model/app/permissions.dart';
 import 'package:aves/model/apps.dart';
 import 'package:aves/model/device.dart';
 import 'package:aves/model/entry/extensions/catalog.dart';
@@ -54,6 +55,7 @@ import 'package:flutter_localization_nn/flutter_localization_nn.dart';
 import 'package:intl/intl.dart';
 import 'package:material_color_utilities/material_color_utilities.dart';
 import 'package:overlay_support/overlay_support.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:screen_brightness/screen_brightness.dart';
 import 'package:url_launcher/url_launcher.dart' as ul;
@@ -424,6 +426,8 @@ class _AvesAppState extends State<AvesApp> with WidgetsBindingObserver {
 
   Widget _getFirstPage({Map? intentData}) => VideoPickPage();
 
+  // Widget _getFirstPage({Map? intentData}) => settings.hasAcceptedTerms ? HomePage(intentData: intentData) : const WelcomePage();
+
   Size? _getScreenSize(BuildContext context) {
     final view = View.of(context);
     final physicalSize = view.physicalSize;
@@ -658,49 +662,75 @@ class AvesScrollBehavior extends MaterialScrollBehavior {
 
 typedef TvMediaQueryModifier = MediaQueryData Function(MediaQueryData);
 
-class VideoPickPage extends StatelessWidget {
+class VideoPickPage extends StatefulWidget {
   const VideoPickPage({super.key});
+
+  @override
+  State<VideoPickPage> createState() => _VideoPickPageState();
+}
+
+class _VideoPickPageState extends State<VideoPickPage> {
+  Future<Map<Permission, PermissionStatus>> _permissionLoader = Permissions.mediaAccess.request();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            AvesOutlinedButton(
-              label: 'pick video (SAF URI)',
-              onPressed: () async {
-                final uri = await storageService.selectFile(MimeTypes.anyVideo);
-                await _play(context, uri);
-              },
-            ),
-            AvesOutlinedButton(
-              label: 'save logs',
-              onPressed: () async {
-                final result = await Process.run('logcat', ['-d']);
-                final logs = result.stdout;
-                await storageService.createFile(
-                  'aves-issue722-logs-${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.txt',
-                  MimeTypes.plainText,
-                  Uint8List.fromList(utf8.encode(logs)),
-                );
-              },
-            ),
-            // AvesOutlinedButton(
-            //   label: 'pick video (cache copy)',
-            //   onPressed: () async {
-            //     final result = await FilePicker.platform.pickFiles(type: FileType.video);
-            //     if (result?.files.isNotEmpty ?? false) {
-            //       final path = result!.files.first.path;
-            //       if (path != null) {
-            //         final uri = 'file://${Uri.encodeFull(path)}';
-            //         await _play(context, uri);
-            //       }
-            //     }
-            //   },
-            // ),
-          ],
+        child: FutureBuilder<Map<Permission, PermissionStatus>>(
+          future: _permissionLoader,
+          builder: (context, snapshot) {
+            final data = snapshot.data;
+            if (data == null) return const SizedBox();
+
+            if (!(data[Permission.storage]?.isGranted ?? false) && !(data[Permission.videos]?.isGranted ?? false)) {
+              return AvesOutlinedButton(
+                label: 'give permission',
+                onPressed: () async {
+                  await openAppSettings();
+                  _permissionLoader = Permissions.mediaAccess.request();
+                  setState(() {});
+                },
+              );
+            }
+
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                AvesOutlinedButton(
+                  label: 'pick video (SAF URI)',
+                  onPressed: () async {
+                    var uri = await storageService.selectFile(MimeTypes.anyVideo);
+                    await _play(context, uri);
+                  },
+                ),
+                AvesOutlinedButton(
+                  label: 'save logs',
+                  onPressed: () async {
+                    final result = await Process.run('logcat', ['-d']);
+                    final logs = result.stdout;
+                    await storageService.createFile(
+                      'aves-issue722-logs-${DateFormat('yyyyMMdd_HHmmss').format(DateTime.now())}.txt',
+                      MimeTypes.plainText,
+                      Uint8List.fromList(utf8.encode(logs)),
+                    );
+                  },
+                ),
+                // AvesOutlinedButton(
+                //   label: 'pick video (cache copy)',
+                //   onPressed: () async {
+                //     final result = await FilePicker.platform.pickFiles(type: FileType.video);
+                //     if (result?.files.isNotEmpty ?? false) {
+                //       final path = result!.files.first.path;
+                //       if (path != null) {
+                //         final uri = 'file://${Uri.encodeFull(path)}';
+                //         await _play(context, uri);
+                //       }
+                //     }
+                //   },
+                // ),
+              ],
+            );
+          },
         ),
       ),
     );
